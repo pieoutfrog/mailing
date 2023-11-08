@@ -1,0 +1,43 @@
+{% extends 'mailing/base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="card">
+        <div class="card-body">
+            <h2 class="card-title">{{ mailing.get_frequency_display }} рассылка </h2>
+            <h6 class="card-title">Статус: {{ mailing.get_status_display }}</h6>
+            <h4>Клиенты рассылки:</h4>
+                {% for client in mailing.client.all %}
+            <div>
+                <h6> Имя: {{ client.full_name }}</h6>
+                <p>Почта: {{ client.email }}</p>
+                <p>Комментарий: {{ client.comment }}</p>
+            </div>
+            {% empty %}
+            <p>Нет связанных клиентов.</p>
+            {% endfor %}
+            <h4>Время рассылки:</h4>
+            <p>{{ mailing.start_time }} - {{ mailing.end_time }}</p>
+            <h4>Сообщение рассылки:</h4>
+            <p>{{ mailing.message.subject }}: {{ mailing.message.message_content }}</p>
+
+
+            <div class="dropdown">
+                <button class="btn btn-block btn-primary dropdown-toggle" type="button" id="addDropdown"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Редактирование
+                </button>
+                <div class="dropdown-menu" aria-labelledby="addDropdown">
+                    <a href="{% url 'mailing:mailing_settings_delete' mailing.id %}"
+                       class="btn btn-dark">Удалить</a>
+                    <a href="{% url 'mailing:mailing_settings_update' mailing.id %}"
+                       class="btn btn-info">Редактировать</a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}

@@ -1,0 +1,13 @@
+{% extends 'mailing/base.html' %}
+
+{% block content %}
+<h1>Список рассылок</h1>
+{% for mailing_client in mailing_clients %}
+{% include 'mailing/includes/inc_mailing_mailing.html' %}
+
+{% endfor %}<br>
+<a href="{% url 'mailing:mailing_settings_create' %}">Создать новую рассылку</a>
+
+{% endblock %}
+
+

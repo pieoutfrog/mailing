@@ -1,0 +1,15 @@
+{% extends 'mailing/base.html' %}
+{% block content %}
+{% for blogpost in category_blog_list %}
+<div class="container">
+    <div class="card">
+        <div class="card-body">
+            <h2 class="card-title">{{ blogpost.name }}</h2>
+            <p class="card-text">Цена: {{ blogpost.price }}</p>
+            <p class="card-text">Описание: {{ blogpost.description }}</p>
+            <p class="card-text">Категория: <a href="{% url 'catalog:category_products' category_id=category.id %}">{{ category.name }}</a></p>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endblock %}
