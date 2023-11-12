@@ -1,4 +1,7 @@
+from datetime import datetime, timedelta
+
 from apscheduler.triggers.cron import CronTrigger
+from apscheduler.triggers.date import DateTrigger
 from django.core.mail import send_mail
 from django.conf import settings
 from django.core.cache import cache
@@ -15,13 +18,12 @@ def add_job(scheduler, mailing_setting, form=None):
     for mailing_setting in MailingSettings.objects.filter(status='running'):
         hours, minutes = mailing_setting.start_time.hour, mailing_setting.start_time.minute
         if mailing_setting.frequency == 'daily':
-            trigger_time = CronTrigger(day="*", hour=hours, minute=minutes)
+            # Запуск задачи ежедневно в указанное время
+            trigger_time = CronTrigger(hour=mailing_setting.start_time.hour, minute=mailing_setting.start_time.minute)
             scheduler.add_job(
                 sending_mail,
                 trigger=trigger_time,
                 id=str(mailing_setting.pk),
-                max_instances=1,
-                replace_existing=True,
                 args=(mailing_setting,)
             )
             EmailLog.objects.create(
@@ -29,14 +31,15 @@ def add_job(scheduler, mailing_setting, form=None):
                 status=form.cleaned_data['status'],
                 settings=mailing_setting
             )
+
         elif mailing_setting.frequency == 'weekly':
-            trigger_time = CronTrigger(day_of_week='mon', hour=hours, minute=minutes)
+            # Запуск задачи каждую неделю в указанный день и время
+            trigger_time = CronTrigger(day_of_week=mailing_setting.start_time.weekday(),
+                                       hour=mailing_setting.start_time.hour, minute=mailing_setting.start_time.minute)
             scheduler.add_job(
                 sending_mail,
                 trigger=trigger_time,
                 id=str(mailing_setting.pk),
-                max_instances=1,
-                replace_existing=True,
                 args=(mailing_setting,)
             )
             EmailLog.objects.create(
@@ -44,14 +47,15 @@ def add_job(scheduler, mailing_setting, form=None):
                 status=form.cleaned_data['status'],
                 settings=mailing_setting
             )
+
         elif mailing_setting.frequency == 'monthly':
-            trigger_time = CronTrigger(day='1', hour=hours, minute=minutes)
+            # Запуск задачи каждый месяц в указанный день и время
+            trigger_time = CronTrigger(day=mailing_setting.start_time.day, hour=mailing_setting.start_time.hour,
+                                       minute=mailing_setting.start_time.minute)
             scheduler.add_job(
                 sending_mail,
                 trigger=trigger_time,
                 id=str(mailing_setting.pk),
-                max_instances=1,
-                replace_existing=True,
                 args=(mailing_setting,)
             )
             EmailLog.objects.create(
@@ -72,6 +76,3 @@ def sending_mail(mailing_setting):
         recipient_list=email_list,
         fail_silently=False,
     )
-
-
-

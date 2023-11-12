@@ -1,0 +1,38 @@
+{% extends 'mailing/base.html' %}
+
+{% block content %}
+<h1>Список рассылок</h1>
+{% for mailing_client in mailing_clients %}
+<div>
+    <h3 class="card-title">{{ mailing_client.get_frequency_display }} рассылка </h3>
+    <p>{{ mailing_client.start_time }} - {{ mailing_client.end_time }}</p>
+    <h4>Клиенты рассылки</h4>
+    {% for client in mailing_client.client.all %}
+    <div>
+        <h6>{{ client }}</h6>
+
+    </div>
+    {% empty %}
+    <p>Нет связанных клиентов.</p>
+    {% endfor %}
+
+
+    <h4>Сообщение рассылки:</h4>
+    <p>{{ mailing_client.message }}</p>
+    <h5>{{ mailing_client.get_status_display }}</h5>
+    <form method="post" action="{% url 'mailing:mailing_list_manager' %}">
+        {% csrf_token %}
+        <input type="hidden" name="mailing_id" value="{{ mailing_client.id }}">
+        <button class="btn {% if mailing_client.is_active == False %}btn-primary{% else %}btn-secondary{% endif %}"
+                type="submit">
+            {% if mailing_client.is_active == True %}
+            Отключить
+            {% else %}
+            Включить
+            {% endif %}
+        </button>
+    </form>
+
+</div>
+{% endfor %}
+{% endblock %}

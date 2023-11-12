@@ -34,6 +34,7 @@ class BlogPostListView(ListView):
     def get_queryset(self):
         queryset = super().get_queryset()
         queryset = queryset.filter(is_published=True)
+
         return queryset
 
 
@@ -43,6 +44,10 @@ class BlogPostCreateView(CreateView):
     form_class = BlogPostForm
 
     def form_valid(self, form):
+        self.object = form.save()
+        self.object.owner = self.request.user
+        self.object.save()
+
         form.instance.is_published = True
         if form.is_valid():
             new_blog = form.save()

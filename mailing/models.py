@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import models
 
 NULLABLE = {'null': True, 'blank': True}
@@ -6,6 +7,8 @@ NULLABLE = {'null': True, 'blank': True}
 class MailingMessage(models.Model):
     subject = models.CharField(max_length=100, verbose_name='Тема')
     message_content = models.TextField(verbose_name='Содержание')
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True,
+                              verbose_name='владелец')
     objects = models.Manager()
 
     def __str__(self):
@@ -21,6 +24,8 @@ class Client(models.Model):
     email = models.EmailField(max_length=100, verbose_name='Почта')
     comment = models.TextField(verbose_name='Комментарий', **NULLABLE)
     objects = models.Manager()
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True,
+                              verbose_name='владелец')
 
     def __str__(self):
         return f'{self.full_name}: {self.email}'
@@ -50,6 +55,9 @@ class MailingSettings(models.Model):
                                 verbose_name='Сообщение для рассылки', **NULLABLE)
     client = models.ManyToManyField(Client,
                                     verbose_name='Клиент рассылки')
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True,
+                              verbose_name='владелец')
+    is_active = models.BooleanField(default=False, verbose_name='Статус активности')
 
     def __str__(self):
         return f"{self.frequency} рассылка в {self.start_time} {self.client}"

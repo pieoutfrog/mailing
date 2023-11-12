@@ -13,7 +13,15 @@ class MailingSettingsCreateForm(forms.ModelForm):
             'frequency': forms.Select(attrs={'class': 'form-control'}),
             'status': forms.Select(attrs={'class': 'form-control'}),
             'message': forms.Select(attrs={'class': 'form-control'}),
+            'owner': forms.Select(attrs={'class': 'form-control'}),
         }
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        instance.owner = self.cleaned_data['owner']
+        if commit:
+            instance.save()
+        return instance
 
 
 class MailingMessageCreateForm(forms.ModelForm):

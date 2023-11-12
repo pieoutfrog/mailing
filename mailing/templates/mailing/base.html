@@ -11,7 +11,9 @@
     <header class="blog-header py-3">
         <div class="row flex-nowrap justify-content-between align-items-center">
             <div class="col-4 pt-1">
-                <a class="text-muted" href="#">Подписаться</a>
+                <a class="text-muted" href="#">Количество рассылок: {{ total_mailings }}</a><br>
+                <a class="text-muted" href="#">Количество активных рассылок: {{ active_mailings }}</a><br>
+                <a class="text-muted" href="#">Количество клиентов: {{ unique_clients }}</a>
             </div>
             <div class="col-4 text-center">
                 <a class="blog-header-logo text-dark" href="#">Огромный</a>
@@ -28,9 +30,10 @@
                 <div class="dropdown">
                     <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="loginDropdown"
                             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Войти
+                        Меню
                     </button>
                     <div class="dropdown-menu" aria-labelledby="loginDropdown">
+                        <a class="dropdown-item" href="{% url 'mailing:home' %}">Главная</a>
                         {% if user.is_authenticated %}
                         <a class="dropdown-item" href="{% url 'users:logout' %}">Выйти</a>
                         <a class="dropdown-item" href="{% url 'mailing:mailing_settings_create' %}">Создать
@@ -67,9 +70,10 @@
 </div>
 <div class="jumbotron p-3 p-md-5 text-white rounded bg-dark">
     <div class="col-md-6 px-0">
-        <h1 class="display-4 font-italic">СЫРНЫЕ КОСИЧКИ АТАКУЮТ</h1>
-        <p class="lead my-3">Реально атакуют</p>
-        <p class="lead mb-0"><a href="#" class="text-white font-weight-bold">Читать далее...</a></p>
+        <h1 class="display-4 font-italic">Напиши свой пост!</h1>
+        <p class="lead my-3">Стань популярным инфлюенсером!</p>
+        <p class="lead mb-0"><a href="{% url 'blog:blogpost_create' %}" class="text-white font-weight-bold">Стать крутым</a></p>
+        <p class="lead mb-0"><a href="{% url 'blog:blogpost_list' %}" class="text-white font-weight-bold">Посмотреть на других крутышек</a></p>
     </div>
 
 

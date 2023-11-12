@@ -1,0 +1,22 @@
+{% extends 'mailing/base.html' %}
+
+{% block content %}
+<h1>Список пользователей</h1>
+{% for user in user_list %}
+  <div>
+    <span>{{ user.email }}</span>
+    <form method="post" action="{% url 'mailing:user_list' %}">
+      {% csrf_token %}
+      <input type="hidden" name="user_id" value="{{ user.id }}">
+      <button class="btn btn-primary" type="submit">
+        {% if user.is_blocked %}
+          Разблокировать
+        {% else %}
+          Заблокировать
+        {% endif %}
+      </button>
+    </form>
+  </div>
+{% endfor %}
+
+{% endblock %}

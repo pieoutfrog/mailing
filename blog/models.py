@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import models
 
 NULLABLE = {'blank': True, 'null': True}
@@ -6,6 +7,7 @@ NULLABLE = {'blank': True, 'null': True}
 class Category(models.Model):
     name = models.CharField(max_length=100, verbose_name='Категория')
     description = models.TextField(verbose_name='Описание', **NULLABLE)
+    objects = models.Manager()
 
     def __str__(self):
         return f'{self.name}: {self.description}'
@@ -25,6 +27,8 @@ class BlogPost(models.Model):
     is_published = models.BooleanField(default=True)
     views_count = models.IntegerField(default=0)
     category = models.ManyToManyField(Category, verbose_name='Категория')
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True,
+                              verbose_name='владелец')
 
     def __str__(self):
         return f'{self.title}: {self.content}'
