@@ -8,7 +8,7 @@ class MailingMessage(models.Model):
     subject = models.CharField(max_length=100, verbose_name='Тема')
     message_content = models.TextField(verbose_name='Содержание')
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True,
-                              verbose_name='владелец')
+                              verbose_name='Владелец')
     objects = models.Manager()
 
     def __str__(self):
@@ -65,6 +65,9 @@ class MailingSettings(models.Model):
     class Meta:
         verbose_name = 'Рассылка'
         verbose_name_plural = 'Рассылки'
+        permissions = [
+            ('can_set_mailing_activity', 'Can change mailing activity'),
+        ]
 
 
 class EmailLog(models.Model):

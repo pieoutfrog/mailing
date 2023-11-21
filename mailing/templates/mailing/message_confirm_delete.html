@@ -1,6 +1,5 @@
 {% extends 'mailing/base.html' %}
 
-{% block content %}
 
 <div class="album py-5 bg-light">
     <div class="container">
@@ -10,9 +9,9 @@
                     <div class="card-body">
                         <form method="post">
                             {% csrf_token %}
-                            <p>Вы уверены, что хотите удалить данную рассылку?</p>
+                            <p>Вы уверены, что хотите удалить данное сообщение?</p>
                             <button type="submit" class="btn btn-dark">Подтвердить</button>
-                            <a href="{% url 'mailing:mailing_list' %}" class="btn btn-info">Отменить</a>
+                            <a href="{% url 'mailing:message_list' %}" class="btn btn-info">Отменить</a>
 
                         </form>
 
@@ -24,5 +23,4 @@
     </div>
 
 </div>
-
 {% endblock %}

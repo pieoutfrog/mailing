@@ -1,0 +1,16 @@
+{% block content %}
+
+<div>
+    <h3 class="card-title">{{ client.full_name }}</h3>
+    <p>{{ client.email }}</p>
+    <p>{{ client.comment }}</p>
+
+
+
+</div>
+<a href="{% url 'mailing:client_details' client.id %}"
+   class="btn btn-primary">Подробнее</a>
+<a href="{% url 'mailing:client_update' client.id %}"
+   class="btn btn-info">Редактировать</a>
+<a href="{% url 'mailing:client_delete' client.id %}" class="btn btn-dark">Удалить</a>
+{% endblock %}

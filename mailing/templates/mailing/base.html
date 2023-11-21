@@ -11,12 +11,12 @@
     <header class="blog-header py-3">
         <div class="row flex-nowrap justify-content-between align-items-center">
             <div class="col-4 pt-1">
-                <a class="text-muted" href="#">Количество рассылок: {{ total_mailings }}</a><br>
+                <a class="text-muted" href="{% url 'mailing:mailing_list' %}">Количество рассылок: {{ total_mailings }}</a><br>
                 <a class="text-muted" href="#">Количество активных рассылок: {{ active_mailings }}</a><br>
-                <a class="text-muted" href="#">Количество клиентов: {{ unique_clients }}</a>
+                <a class="text-muted" href="{% url 'mailing:client_list' %}">Количество клиентов: {{ unique_clients }}</a>
             </div>
             <div class="col-4 text-center">
-                <a class="blog-header-logo text-dark" href="#">Огромный</a>
+                <a class="blog-header-logo text-dark" href="{% url 'mailing:home' %}">Огромный</a>
             </div>
             <div class="col-4 d-flex justify-content-end align-items-center">
                 <a class="text-muted" href="#">
@@ -27,44 +27,34 @@
                         <line x1="21" y1="21" x2="15.8" y2="15.8"></line>
                     </svg>
                 </a>
-                <div class="dropdown">
-                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="loginDropdown"
-                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Меню
-                    </button>
-                    <div class="dropdown-menu" aria-labelledby="loginDropdown">
-                        <a class="dropdown-item" href="{% url 'mailing:home' %}">Главная</a>
-                        {% if user.is_authenticated %}
-                        <a class="dropdown-item" href="{% url 'users:logout' %}">Выйти</a>
-                        <a class="dropdown-item" href="{% url 'mailing:mailing_settings_create' %}">Создать
-                            рассылку</a>
-                        <a class="dropdown-item" href="{% url 'mailing:mailing_list' %}">Список рассылок</a>
-                        <a class="dropdown-item" href="{% url 'users:profile' %}">Профиль</a>
-                        {% else %}
-                        <a class="dropdown-item" href="{% url 'users:login' %}">Войти</a>
-                        <a class="dropdown-item" href="{% url 'users:register' %}">Регистрация</a>
-                        {% endif %}
-                    </div>
-                </div>
 
             </div>
         </div>
     </header>
 
     <div class="nav-scroller py-1 mb-2">
+        {% if user.is_authenticated %}
         <nav class="nav d-flex justify-content-between">
-            <a class="p-2 text-muted" href="#">World</a>
-            <a class="p-2 text-muted" href="#">U.S.</a>
-            <a class="p-2 text-muted" href="#">Technology</a>
-            <a class="p-2 text-muted" href="#">Design</a>
-            <a class="p-2 text-muted" href="#">Culture</a>
-            <a class="p-2 text-muted" href="#">Business</a>
-            <a class="p-2 text-muted" href="#">Politics</a>
-            <a class="p-2 text-muted" href="#">Opinion</a>
-            <a class="p-2 text-muted" href="#">Science</a>
-            <a class="p-2 text-muted" href="#">Health</a>
-            <a class="p-2 text-muted" href="#">Style</a>
-            <a class="p-2 text-muted" href="#">Travel</a>
+            <a class="p-2 text-muted" href="{% url 'users:logout' %}">Выйти</a>
+            <a class="p-2 text-muted" href="{% url 'mailing:mailing_settings_create' %}">Создать
+                рассылку</a>
+                        <a class="p-2 text-muted" href="{% url 'mailing:message_create' %}">Создать
+                сообщение</a>
+                        <a class="p-2 text-muted" href="{% url 'mailing:mailing_settings_create' %}">Создать
+                клиента</a>
+            {% if user.is_staff %}
+                        <a class="p-2 text-muted" href="{% url 'mailing:mailing_list_manager' %}">Список рассылок</a>
+            {% else %}
+            <a class="p-2 text-muted" href="{% url 'mailing:mailing_list' %}">Список рассылок</a>
+            <a class="p-2 text-muted" href="{% url 'mailing:message_list' %}">Список сообщений</a>
+            <a class="p-2 text-muted" href="{% url 'mailing:client_list' %}">Список клиентов</a>
+            {% endif %}
+            <a class="p-2 text-muted" href="{% url 'mailing:user_list' %}">Список пользователей</a>
+            <a class="p-2 text-muted" href="{% url 'users:profile' %}">Профиль</a>
+            {% else %}
+            <a class="p-2 text-muted" href="{% url 'users:login_in' %}">Войти</a>
+            <a class="p-2 text-muted" href="{% url 'users:register' %}">Регистрация</a>
+            {% endif %}
         </nav>
     </div>
 </div>
@@ -72,8 +62,10 @@
     <div class="col-md-6 px-0">
         <h1 class="display-4 font-italic">Напиши свой пост!</h1>
         <p class="lead my-3">Стань популярным инфлюенсером!</p>
-        <p class="lead mb-0"><a href="{% url 'blog:blogpost_create' %}" class="text-white font-weight-bold">Стать крутым</a></p>
-        <p class="lead mb-0"><a href="{% url 'blog:blogpost_list' %}" class="text-white font-weight-bold">Посмотреть на других крутышек</a></p>
+        <p class="lead mb-0"><a href="{% url 'blog:blogpost_create' %}" class="text-white font-weight-bold">Стать
+            крутым</a></p>
+        <p class="lead mb-0"><a href="{% url 'blog:blogpost_list' %}" class="text-white font-weight-bold">Посмотреть на
+            других крутышек</a></p>
     </div>
 
 
@@ -104,4 +96,3 @@
       text: 'Thumbnail'
     });
 </script>
-

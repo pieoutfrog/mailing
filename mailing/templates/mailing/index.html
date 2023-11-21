@@ -17,7 +17,8 @@
                 <p class="card-text mb-auto">{{ top_article.content|truncatewords:15 }}</p>
                 <a href="{% url 'blog:blogpost_view' top_article.pk %}">Читать далее...</a>
             </div>
-            <img src="{{ top_article.preview|mymedia }}" alt="Изображение" class="card-img-right img-fluid" style="width: 400; height: 200px;"><br>
+            <img src="{{ top_article.preview|mymedia }}" alt="Изображение" class="card-img-right img-fluid"
+                 style="width: 400; height: 200px;"><br>
         </div>
     </div>
     <div class="col-md-4">
@@ -31,7 +32,8 @@
                 <p class="card-text mb-auto">{{ latest_article.content|truncatewords:15 }}</p>
                 <a href="{% url 'blog:blogpost_view' latest_article.pk %}">Читать далее...</a>
             </div>
-            <img src="{{ latest_article.preview|mymedia }}" alt="Изображение" class="card-img-right img-fluid" style="width: 300; height: 200px;"><br>
+            <img src="{{ latest_article.preview|mymedia }}" alt="Изображение" class="card-img-right img-fluid"
+                 style="width: 300; height: 200px;"><br>
         </div>
     </div>
 </div>
@@ -51,10 +53,12 @@
                 {% endfor %}
                 <p class="blog-post-meta">{{ article.created_date }} <a href="#">{{ article.owner }}</a></p>
                 <p>{{ article.content }}</p>
-                <img src="{{ article.preview|mymedia }}" alt="Изображение" class="card-img-right img-fluid" style="max-width: 600px;"><br>
-            <div class="card-footer">
-            </div><!-- /.blog-post -->
-            {% endfor %}
+                <img src="{{ article.preview|mymedia }}" alt="Изображение" class="card-img-right img-fluid"
+                     style="max-width: 600px;"><br>
+                <div class="card-footer">
+                </div><!-- /.blog-post -->
+                {% endfor %}
+            </div>
         </div>
     </div>
 </main>
@@ -65,4 +69,4 @@
 </nav>
 
 
-    {% endblock %}
+{% endblock %}

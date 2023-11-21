@@ -1,4 +1,5 @@
 from django.contrib.auth.decorators import user_passes_test
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.http import Http404
 from django.shortcuts import redirect
 from django.urls import reverse_lazy, reverse
@@ -6,8 +7,8 @@ from django.utils.decorators import method_decorator
 from django.views.generic import ListView, CreateView, DetailView, UpdateView, DeleteView, TemplateView
 
 from blog.models import BlogPost, Category
-from mailing.forms import MailingSettingsCreateForm, MailingMessageCreateForm
-from mailing.models import MailingSettings, MailingMessage
+from mailing.forms import MailingSettingsCreateForm, MailingMessageCreateForm, ClientCreateForm
+from mailing.models import MailingSettings, MailingMessage, Client
 from users.models import User
 
 
@@ -26,7 +27,7 @@ class HomeView(TemplateView):
         context['active_mailings'] = active_mailings
 
         # Количество уникальных клиентов для рассылок
-        unique_clients = MailingSettings.objects.values('client').distinct().count()
+        unique_clients = Client.objects.distinct().count()
         context['unique_clients'] = unique_clients
 
         # 3 случайные статьи из блога
@@ -42,13 +43,22 @@ class HomeView(TemplateView):
         latest_article = BlogPost.objects.order_by('-created_date').first()
         context['latest_article'] = latest_article
 
+        print(unique_clients)
+
         return context
 
 
-class UserListView(ListView):
+class UserListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     model = User
     template_name = 'mailing/user_list.html'
     context_object_name = 'user_list'
+
+    def test_func(self):
+        return self.request.user.groups.filter(name='Менеджер').exists()
+
+    def get_queryset(self):
+        queryset = User.objects.filter(is_staff=False)
+        return queryset
 
     def post(self, request):
         user_id = request.POST.get('user_id')
@@ -58,16 +68,13 @@ class UserListView(ListView):
         return self.get(request)
 
 
-@method_decorator(user_passes_test(lambda u: u.groups.filter(name='Менеджер').exists()), name='dispatch')
-class MailingListManagerView(ListView):
+class MailingListManagerView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     model = MailingSettings
     template_name = 'mailing/mailing_list_manager.html'
     context_object_name = 'mailing_clients'
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['mailing_settings'] = MailingSettings.objects.all()
-        return context
+    def test_func(self):
+        return self.request.user.groups.filter(name='Менеджер').exists()
 
     def post(self, request):
         mailing_id = request.POST.get('mailing_id')  # Получаем идентификатор рассылки из запроса
@@ -83,7 +90,7 @@ class MailingListManagerView(ListView):
         return redirect('mailing:mailing_list_manager')
 
 
-class MailingSettingsListView(ListView):
+class MailingSettingsListView(LoginRequiredMixin, ListView):
     model = MailingSettings
     template_name = 'mailing/mailing_list.html'
     context_object_name = 'mailing_clients'
@@ -99,7 +106,7 @@ class MailingSettingsListView(ListView):
         return queryset
 
 
-class MailingSettingsCreateView(CreateView):
+class MailingSettingsCreateView(LoginRequiredMixin, CreateView):
     template_name = 'mailing/mailing_settings_create.html'
     model = MailingSettings
     form_class = MailingSettingsCreateForm
@@ -113,23 +120,23 @@ class MailingSettingsCreateView(CreateView):
 
         return super().form_valid(form)
 
-    # проверка времени в кроне
     def get_success_url(self):
         return reverse_lazy('mailing:mailing_list')
 
 
-class MailingSettingsDetailView(DetailView):
+class MailingSettingsDetailView(LoginRequiredMixin, DetailView):
     template_name = 'mailing/mailing_details.html'
     model = MailingSettings
     context_object_name = 'mailing'
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        # Дополнительный код для получения дополнительных данных, если требуется
-        return context
+    def get_object(self, queryset=None):
+        self.object = super().get_object(queryset)
+        if self.object.owner != self.request.user and not self.request.user.is_staff:
+            raise Http404
+        return self.object
 
 
-class MailingSettingsUpdateView(UpdateView):
+class MailingSettingsUpdateView(LoginRequiredMixin, UpdateView):
     template_name = 'mailing/mailing_settings_create.html'
     model = MailingSettings
     form_class = MailingSettingsCreateForm
@@ -139,7 +146,9 @@ class MailingSettingsUpdateView(UpdateView):
         mailing_settings = form.save(commit=False)
         mailing_settings.message = mailing_message
         mailing_settings.save()
-
+        self.object = form.save()
+        self.object.owner = self.request.user
+        self.object.save()
         return super().form_valid(form)
 
     def get_object(self, queryset=None):
@@ -152,7 +161,7 @@ class MailingSettingsUpdateView(UpdateView):
         return reverse('mailing:mailing_details', args=[self.kwargs.get('pk')])
 
 
-class MailingSettingsDeleteView(DeleteView):
+class MailingSettingsDeleteView(LoginRequiredMixin, DeleteView):
     template_name = 'mailing/mailingclient_confirm_delete.html'
     model = MailingSettings
 
@@ -160,7 +169,7 @@ class MailingSettingsDeleteView(DeleteView):
         return reverse_lazy('mailing:mailing_list')
 
 
-class MessageCreateView(CreateView):
+class MessageCreateView(LoginRequiredMixin, CreateView):
     model = MailingMessage
     form_class = MailingMessageCreateForm
     template_name = 'mailing/message_create.html'
@@ -174,3 +183,149 @@ class MessageCreateView(CreateView):
 
     def get_success_url(self):
         return reverse_lazy('mailing:home')
+
+
+class MessageListView(LoginRequiredMixin, ListView):
+    model = MailingMessage
+    template_name = 'mailing/message_list.html'
+    context_object_name = 'mailing_messages'
+    mailing_messages = MailingMessage.objects.all()
+    context = {
+        'mailing_messages': mailing_messages,
+    }
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        if not self.request.user.is_staff:
+            queryset = queryset.filter(owner=self.request.user)
+        return queryset
+
+
+class MessageDetailsView(LoginRequiredMixin, DetailView):
+    template_name = 'mailing/message_details.html'
+    model = MailingMessage
+    context_object_name = 'mailing_messages'
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        if not self.request.user.is_staff:
+            queryset = queryset.filter(owner=self.request.user)
+        return queryset
+
+
+class MessageDeleteView(LoginRequiredMixin, DeleteView):
+    template_name = 'mailing/message_confirm_delete.html'
+    model = MailingMessage
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        if not self.request.user.is_staff:
+            queryset = queryset.filter(owner=self.request.user)
+        return queryset
+
+    def get_success_url(self):
+        return reverse_lazy('mailing:message_list')
+
+
+class MessageUpdateView(LoginRequiredMixin, UpdateView):
+    template_name = 'mailing/message_create.html'
+    model = MailingMessage
+    form_class = MailingMessageCreateForm
+
+    def form_valid(self, form):
+        mailing_message = form.cleaned_data['message']
+        mailing_settings = form.save(commit=False)
+        mailing_settings.message = mailing_message
+        mailing_settings.save()
+
+        return super().form_valid(form)
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        if not self.request.user.is_staff:
+            queryset = queryset.filter(owner=self.request.user)
+        return queryset
+
+    def get_success_url(self):
+        return reverse('mailing:mailing_details', args=[self.kwargs.get('pk')])
+
+
+class ClientCreateView(LoginRequiredMixin, CreateView):
+    model = Client
+    form_class = ClientCreateForm
+    template_name = 'mailing/clientcreate.html'
+
+    def form_valid(self, form):
+        self.object = form.save()
+        self.object.owner = self.request.user
+        self.object.save()
+
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse_lazy('mailing:home')
+
+
+class ClientListView(LoginRequiredMixin, ListView):
+    model = Client
+    template_name = 'mailing/client_list.html'
+    context_object_name = 'clients'
+    clients = Client.objects.all()
+    context = {
+        'clients': clients,
+    }
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        if not self.request.user.is_staff:
+            queryset = queryset.filter(owner=self.request.user)
+        return queryset
+
+
+class ClientDetailsView(LoginRequiredMixin, DetailView):
+    template_name = 'mailing/client_details.html'
+    model = Client
+    context_object_name = 'clients'
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        if not self.request.user.is_staff:
+            queryset = queryset.filter(owner=self.request.user)
+        return queryset
+
+
+class ClientDeleteView(LoginRequiredMixin, DeleteView):
+    template_name = 'mailing/client_confirm_delete.html'
+    model = Client
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        if not self.request.user.is_staff:
+            queryset = queryset.filter(owner=self.request.user)
+        return queryset
+
+    def get_success_url(self):
+        return reverse_lazy('mailing:client_list')
+
+
+class ClientUpdateView(LoginRequiredMixin, UpdateView):
+    template_name = 'mailing/client_create.html'
+    model = Client
+    form_class = ClientCreateForm
+
+    def form_valid(self, form):
+        client = form.cleaned_data['client']
+        mailing_settings = form.save(commit=False)
+        mailing_settings.client = client
+        mailing_settings.save()
+
+        return super().form_valid(form)
+
+    def get_object(self, queryset=None):
+        self.object = super().get_object(queryset)
+        if self.object.owner != self.request.user and not self.request.user.is_staff:
+            raise Http404
+        return self.object
+
+    def get_success_url(self):
+        return reverse('mailing:client_details', args=[self.kwargs.get('pk')])

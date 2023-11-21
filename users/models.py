@@ -34,3 +34,8 @@ class User(AbstractUser):
     REQUIRED_FIELDS = []
 
     objects = UserManager()
+
+    class Meta:
+        permissions = [('can_set_user_blocked', 'Can block user'),
+                       ('can_view_users', 'Can view users'),
+                       ]

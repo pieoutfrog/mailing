@@ -1,0 +1,10 @@
+{% extends 'mailing/base.html' %}
+
+{% block content %}
+
+<h1>Список Сообщений</h1>
+{% for message in mailing_messages %}
+{% include 'mailing/includes/inc_mailing_messages.html' %}
+{% endfor %}<br>
+
+{% endblock %}

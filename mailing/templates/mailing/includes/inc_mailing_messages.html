@@ -1,0 +1,16 @@
+{% block content %}
+
+<div>
+    <h3 class="card-title">{{ message.subject }}</h3>
+    <p>{{ message.message_content }}</p>
+    <p>{{ message.owner }}</p>
+
+
+
+</div>
+<a href="{% url 'mailing:message_details' message.id %}"
+   class="btn btn-primary">Подробнее</a>
+<a href="{% url 'mailing:message_update' message.id %}"
+   class="btn btn-info">Редактировать</a>
+<a href="{% url 'mailing:message_delete' message.id %}" class="btn btn-dark">Удалить</a>
+{% endblock %}

@@ -7,11 +7,15 @@
     <div class="card">
         <div class="card-body">
             <h2 class="card-title">{{ blogposts.title }}</h2>
+            <div class="card-footer">
+                Автор: {{ object.owner }}</div><br>
             <p class="card-text"><strong>Контент:</strong><br>{{ blogposts.content }}</p>
             <img src="{{ blogposts.preview|mymedia }}" alt="Изображение" class="card-img-right img-fluid" style="max-width: 600px;"><br>
             <div class="card-footer">
                 Просмотры: {{ object.views_count }}</div><br>
+             {% if blogpost.owner == request.user %}
             <a href="{% url 'blog:blogpost_edit' blogposts.id %}" class="btn btn-primary">Редактировать</a>
+                {% endif %}
         </div>
     </div>
 </div>

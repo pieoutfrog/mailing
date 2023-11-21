@@ -1,6 +1,6 @@
 from django import forms
 
-from mailing.models import MailingSettings, MailingMessage
+from mailing.models import MailingSettings, MailingMessage, Client
 
 
 class MailingSettingsCreateForm(forms.ModelForm):
@@ -28,3 +28,23 @@ class MailingMessageCreateForm(forms.ModelForm):
     class Meta:
         model = MailingMessage
         fields = '__all__'
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        instance.owner = self.cleaned_data['owner']
+        if commit:
+            instance.save()
+        return instance
+
+
+class ClientCreateForm(forms.ModelForm):
+    class Meta:
+        model = Client
+        fields = '__all__'
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        instance.owner = self.cleaned_data['owner']
+        if commit:
+            instance.save()
+        return instance

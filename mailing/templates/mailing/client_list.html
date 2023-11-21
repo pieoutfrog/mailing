@@ -1,0 +1,8 @@
+{% extends 'mailing/base.html' %}
+
+{% block content %}
+<h1>Список клиентов</h1>
+{% for client in clients %}
+{% include 'mailing/includes/inc_mailing_clients.html' %}
+{% endfor %}<br>
+{% endblock %}

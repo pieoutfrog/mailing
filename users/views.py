@@ -31,7 +31,7 @@ class RegisterView(CreateView):
 
 class LoginUserView(LoginView):
     model = User
-    template_name = 'users/login.html'
+    template_name = 'users/login_in.html'
 
     def get_success_url(self):
         return reverse_lazy('users:profile')

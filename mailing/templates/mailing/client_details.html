@@ -1,0 +1,27 @@
+{% extends 'mailing/base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="card">
+        <div class="card-body">
+            <h3 class="card-title">{{ clients.full_name }}</h3>
+            <p>{{ clients.email }}</p>
+            <p>{{ clients.comment }}</p>
+            <div class="dropdown">
+                <button class="btn btn-block btn-primary dropdown-toggle" type="button" id="addDropdown"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Редактирование
+                </button>
+                <div class="dropdown-menu" aria-labelledby="addDropdown">
+                    <a href="{% url 'mailing:client_delete' clients.id %}"
+                       class="btn btn-dark">Удалить</a>
+                    <a href="{% url 'mailing:client_update' clients.id %}"
+                       class="btn btn-info">Редактировать</a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}
