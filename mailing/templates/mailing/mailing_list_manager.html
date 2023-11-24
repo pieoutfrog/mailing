@@ -33,4 +33,7 @@
 
 </div>
 {% endfor %}
+{% if not mailing_client %}
+<p>Клиентов нет.</p>
+{% endif %}
 {% endblock %}

@@ -1,7 +1,6 @@
 {% extends 'mailing/base.html' %}
 
 {% block content %}
-
 <div class="album py-5 bg-light">
     <div class="container">
         <div class="row">
@@ -13,16 +12,11 @@
                             <p>Вы уверены, что хотите удалить данную рассылку?</p>
                             <button type="submit" class="btn btn-dark">Подтвердить</button>
                             <a href="{% url 'mailing:mailing_list' %}" class="btn btn-info">Отменить</a>
-
                         </form>
-
-
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
 </div>
-
 {% endblock %}

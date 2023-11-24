@@ -11,23 +11,15 @@
     <header class="blog-header py-3">
         <div class="row flex-nowrap justify-content-between align-items-center">
             <div class="col-4 pt-1">
+                {% if user.is_authenticated %}
                 <a class="text-muted" href="{% url 'mailing:mailing_list' %}">Количество рассылок: {{ total_mailings }}</a><br>
                 <a class="text-muted" href="#">Количество активных рассылок: {{ active_mailings }}</a><br>
                 <a class="text-muted" href="{% url 'mailing:client_list' %}">Количество клиентов: {{ unique_clients }}</a>
+                {% else %}
+                {% endif %}
             </div>
             <div class="col-4 text-center">
                 <a class="blog-header-logo text-dark" href="{% url 'mailing:home' %}">Огромный</a>
-            </div>
-            <div class="col-4 d-flex justify-content-end align-items-center">
-                <a class="text-muted" href="#">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                         class="mx-3">
-                        <circle cx="10.5" cy="10.5" r="7.5"></circle>
-                        <line x1="21" y1="21" x2="15.8" y2="15.8"></line>
-                    </svg>
-                </a>
-
             </div>
         </div>
     </header>
@@ -38,12 +30,14 @@
             <a class="p-2 text-muted" href="{% url 'users:logout' %}">Выйти</a>
             <a class="p-2 text-muted" href="{% url 'mailing:mailing_settings_create' %}">Создать
                 рассылку</a>
-                        <a class="p-2 text-muted" href="{% url 'mailing:message_create' %}">Создать
+            <a class="p-2 text-muted" href="{% url 'mailing:message_create' %}">Создать
                 сообщение</a>
-                        <a class="p-2 text-muted" href="{% url 'mailing:mailing_settings_create' %}">Создать
+            <a class="p-2 text-muted" href="{% url 'mailing:client_create' %}">Создать
                 клиента</a>
-            {% if user.is_staff %}
-                        <a class="p-2 text-muted" href="{% url 'mailing:mailing_list_manager' %}">Список рассылок</a>
+            {% if user.is_staff or user.is_superuser %}
+            <a class="p-2 text-muted" href="{% url 'mailing:mailing_list_manager' %}">Список рассылок</a>
+            <a class="p-2 text-muted" href="{% url 'mailing:message_list' %}">Список сообщений</a>
+            <a class="p-2 text-muted" href="{% url 'mailing:client_list' %}">Список клиентов</a>
             {% else %}
             <a class="p-2 text-muted" href="{% url 'mailing:mailing_list' %}">Список рассылок</a>
             <a class="p-2 text-muted" href="{% url 'mailing:message_list' %}">Список сообщений</a>

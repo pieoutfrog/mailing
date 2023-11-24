@@ -13,4 +13,8 @@
 <a href="{% url 'mailing:client_update' client.id %}"
    class="btn btn-info">Редактировать</a>
 <a href="{% url 'mailing:client_delete' client.id %}" class="btn btn-dark">Удалить</a>
+{% if not client %}
+<p>Клиентов нет.</p>
+{% endif %}
+
 {% endblock %}

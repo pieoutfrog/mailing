@@ -20,5 +20,7 @@
     </form>
   </div>
 {% endfor %}
-
+{% if not user %}
+<p>Пользователей нет.</p>
+{% endif %}
 {% endblock %}

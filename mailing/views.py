@@ -1,5 +1,6 @@
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.core.cache import cache
 from django.http import Http404
 from django.shortcuts import redirect
 from django.urls import reverse_lazy, reverse
@@ -7,6 +8,7 @@ from django.utils.decorators import method_decorator
 from django.views.generic import ListView, CreateView, DetailView, UpdateView, DeleteView, TemplateView
 
 from blog.models import BlogPost, Category
+from config import settings
 from mailing.forms import MailingSettingsCreateForm, MailingMessageCreateForm, ClientCreateForm
 from mailing.models import MailingSettings, MailingMessage, Client
 from users.models import User
@@ -17,9 +19,15 @@ class HomeView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
         # Количество рассылок всего
-        total_mailings = MailingSettings.objects.count()
+        if settings.CACHE_ENABLED:
+            total_mailings = cache.get('total_mailings')
+            if total_mailings is None:
+                total_mailings = MailingSettings.objects.count()
+                cache.set('total_mailings', total_mailings)
+        else:
+            total_mailings = MailingSettings.objects.count()
+
         context['total_mailings'] = total_mailings
 
         # Количество активных рассылок
@@ -37,13 +45,26 @@ class HomeView(TemplateView):
         categories = Category.objects.all()
         context['categories'] = categories
 
-        top_article = BlogPost.objects.order_by('-views_count').first()
+        if settings.CACHE_ENABLED:
+            top_article = cache.get('top_article')
+            if top_article is None:
+                top_article = BlogPost.objects.order_by('-views_count').first()
+                cache.set('top_article', top_article)
+        else:
+            top_article = BlogPost.objects.order_by('-views_count').first()
+
         context['top_article'] = top_article
 
-        latest_article = BlogPost.objects.order_by('-created_date').first()
-        context['latest_article'] = latest_article
 
-        print(unique_clients)
+        if settings.CACHE_ENABLED:
+            latest_article = cache.get('latest_article')
+            if latest_article is None:
+                latest_article = BlogPost.objects.order_by('-created_date').first()
+                cache.set('latest_article', latest_article)
+        else:
+            latest_article = BlogPost.objects.order_by('-created_date').first()
+
+        context['latest_article'] = latest_article
 
         return context
 
@@ -253,7 +274,7 @@ class MessageUpdateView(LoginRequiredMixin, UpdateView):
 class ClientCreateView(LoginRequiredMixin, CreateView):
     model = Client
     form_class = ClientCreateForm
-    template_name = 'mailing/clientcreate.html'
+    template_name = 'mailing/client_create.html'
 
     def form_valid(self, form):
         self.object = form.save()

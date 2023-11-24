@@ -7,11 +7,15 @@
 <p>{{ blogpost.content }}</p>
 <a href="{% url 'blog:blogpost_view' blogpost.id %}" class="btn btn-primary">Подробнее</a>
 
- {% if blogpost.owner == request.user %}
-        <a href="{% url 'blog:blogpost_edit' blogpost.id %}" class="btn btn-info">Редактировать</a>
-        <a href="{% url 'blog:blogpost_delete' blogpost.id %}" class="btn btn-dark">Удалить</a>
-    {% endif %}
-{% empty %}
+{% if blogpost.owner == request.user %}
+<a href="{% url 'blog:blogpost_edit' blogpost.id %}" class="btn btn-info">Редактировать</a>
+<a href="{% url 'blog:blogpost_delete' blogpost.id %}" class="btn btn-dark">Удалить</a>
+{% endif %}
+
+{% if not blogpost %}
 <p>Постов нет, станьте первым.</p>
+{% endif %}
+
+
 {% endfor %}
 {% endblock %}

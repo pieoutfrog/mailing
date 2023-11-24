@@ -76,7 +76,7 @@ class EmailLog(models.Model):
         ('STATUS_FAILED', 'Ошибка'),
     )
     datetime_attempt = models.DateTimeField(auto_now_add=True, verbose_name='Последняя попытка')
-    status = models.CharField(choices=STATUSES, default='STATUS_OK', verbose_name='Статус')
+    status = models.CharField(choices=STATUSES, max_length=20, default='STATUS_OK', verbose_name='Статус')
     client = models.ManyToManyField(Client, verbose_name='Клиент')
     settings = models.ForeignKey(MailingSettings, on_delete=models.CASCADE, verbose_name='Настройки', **NULLABLE)
     objects = models.Manager()

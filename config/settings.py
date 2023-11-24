@@ -20,7 +20,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-l@#wus5f59k2uobp40ag=-)&rga2@(=l9u-r!pa3!%*^8hh7m6'
+SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -52,8 +52,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    "django.middleware.cache.UpdateCacheMiddleware",
-    "django.middleware.cache.FetchFromCacheMiddleware",
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -152,6 +150,8 @@ LOGOUT_REDIRECT_URL = '/'
 APSCHEDULER_DATETIME_FORMAT = "N j, Y, f:s a"
 
 APSCHEDULER_RUN_NOW_TIMEOUT = 25  # Seconds
+
+CACHE_ENABLED = True
 
 CACHES = {
     "default": {
